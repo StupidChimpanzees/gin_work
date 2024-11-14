@@ -1,85 +1,112 @@
 package config
 
 import (
-	"maps"
-	"os"
-	"path"
-	"runtime"
+	"encoding/xml"
+	"fmt"
+	"github.com/goccy/go-json"
+	"gopkg.in/yaml.v3"
+	"reflect"
 	"strings"
-	"workspace/src/framework/extend/utils"
+	"workspace/src/gin_custom/extend/utils"
 )
 
-type Params map[string]any
-
 type Config struct {
-	Params
-	path     string
-	filename string
-	ext      string
+	App      AppConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
+	Database DatabaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
+	Cache    CacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
+	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
+	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
+	View     ViewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
 }
 
-var Info *Config
+type AppConfiguration struct {
+	Name    string `yaml:"name" bson:"name" json:"name" xml:"name"`
+	Version string `yaml:"version" bson:"version" json:"version" xml:"version"`
+	Port    int    `yaml:"port" bson:"port" json:"port" xml:"port"`
+}
+
+type DatabaseConfiguration struct {
+	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
+	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
+	Username string `yaml:"username" bson:"username" json:"username" xml:"username"`
+	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
+}
+
+type CacheConfiguration struct {
+	CType    string `yaml:"cache_type" bson:"cache_type" json:"cache_type" xml:"cache_type"`
+	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
+	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
+	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
+	Prefix   string `yaml:"prefix" bson:"prefix" json:"prefix" xml:"prefix"`
+	Timeout  int    `yaml:"timeout" bson:"timeout" json:"timeout" xml:"timeout"`
+}
+
+type CookieConfiguration struct {
+	Expire   int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
+	Path     string `yaml:"path" bson:"path" json:"path" xml:"path"`
+	Domain   string `yaml:"domain" bson:"domain" json:"domain" xml:"domain"`
+	Secure   bool   `yaml:"secure" bson:"secure" json:"secure" xml:"secure"`
+	HttpOnly bool   `yaml:"http_only" bson:"http_only" json:"http_only" xml:"http_only"`
+}
+
+type SessionConfiguration struct {
+	Secret      string `yaml:"secret" bson:"secret" json:"secret" xml:"secret"`
+	Expire      int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
+	SessionName string `yaml:"session_name" bson:"session_name" json:"session_name" xml:"session_name"`
+}
+
+type ViewConfiguration struct {
+	TempPath   string `yaml:"temp_path" bson:"temp_path" json:"temp_path" xml:"temp_path"`
+	StaticPath string `yaml:"static_path" bson:"static_path" json:"static_path" xml:"static_path"`
+	DelimBegin string `yaml:"delim_begin" bson:"delim_begin" json:"delim_begin" xml:"delim_begin"`
+	DelimEnd   string `yaml:"delim_end" bson:"delim_end" json:"delim_end" xml:"delim_end"`
+}
+
+var Instance *Config
 
 func init() {
-	_, fileName, _, _ := runtime.Caller(0)
-	Info = &Config{Params: Params{}, path: path.Dir(path.Dir(path.Dir(fileName))), ext: ".xml"}
+	Instance = &Config{}
 }
 
-func (Config) SetPath(path string) {
-	Info.path = path
-}
-
-func (Config) SetExt(ext string) {
-	Info.ext = ext
-}
-
-func (Config) GetExt() string {
-	return Info.ext
-}
-
-func (Config) formatFilename(file string) {
-	strings.TrimSpace(file)
-	pathArr := strings.Split(file, string(os.PathSeparator))
-	var filename string
-	if len(pathArr) > 1 {
-		filename = pathArr[len(pathArr)-1]
-	} else {
-		filename = file
+func (Config) ParamsToConfig(file string) error {
+	fileContent, _ := utils.GetSmallFileContent(file)
+	var err error = nil
+	switch Info.GetExt() {
+	case ".yaml", ".yml":
+		err = yaml.Unmarshal(fileContent, Instance)
+	case ".json":
+		err = json.Unmarshal(fileContent, Instance)
+	case ".bson":
+	// 空着先
+	case ".xml":
+		err = xml.Unmarshal(fileContent, Instance)
 	}
-	filenameArr := strings.Split(filename, ".")
-	if len(filenameArr) > 1 {
-		Info.filename = filenameArr[len(filenameArr)-2]
-		Info.SetExt("." + filenameArr[len(filenameArr)-1])
-	} else {
-		Info.filename = filenameArr[len(filenameArr)-1]
-	}
-}
-
-func (Config) Load(file string) error {
-	Info.formatFilename(file)
-	var err error
-	if _, err = os.Stat(file); err != nil {
-		file = Info.path + string(os.PathSeparator) + Info.filename + Info.ext
-		if _, err = os.Stat(file); err != nil {
-			return err
-		}
-	}
-	err = configInstance.Parse(file)
 	if err != nil {
 		return err
 	}
-	Info.Params = configInstance.ParamsToConfig()
+
 	return nil
 }
 
-func (Config) Set(name string, value any) Params {
+func (Config) Set(name string, value any) *Config {
+	fmt.Println(*Instance)
+	var configValue any
 	strArr := strings.Split(name, ".")
-	configValue := utils.StrArrToMultiMap(strArr, value)
-	maps.Copy(Info.Params, configValue)
-	return Info.Params
+	for i := 0; i < len(strArr); i++ {
+		configValue = utils.GetParams(Instance, strArr[i], strings.TrimLeft(Info.ext, "."))
+		fmt.Println("=========================")
+		fmt.Println(reflect.TypeOf(configValue))
+		if configValue == nil {
+			return nil
+		}
+		if i == len(strArr)-1 {
+			configValue = value
+		}
+	}
+	return Instance
 }
 
-func (Config) Get(name string) any {
+/*func (Config) Get(name string) any {
 	strArr := strings.Split(name, ".")
 	for _, v := range strArr {
 		if value, ok := Info.Params[v]; !ok {
@@ -91,4 +118,4 @@ func (Config) Get(name string) any {
 		}
 	}
 	return nil
-}
+}*/

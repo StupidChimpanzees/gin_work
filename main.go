@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"workspace/src/framework/extend/config"
+	"workspace/src/gin_custom/extend/config"
 )
 
 func main() {
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		return
 	}
+	fmt.Println("----------------")
+	fmt.Println(config.Instance.Set("app.version", "1.1.0"))
 
 	// 加载中间件
 
