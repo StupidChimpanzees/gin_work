@@ -1,33 +1,26 @@
 package utils
 
 import (
-	"fmt"
 	"reflect"
 )
 
-func GetParams(object any, objName string, formatType string) any {
+func GetParams(object any, formatType string) map[string]any {
+	var configMap = make(map[string]any)
 	objType := reflect.TypeOf(object)
 	objValue := reflect.ValueOf(object)
-	fmt.Println("+++++++++++++++")
-	fmt.Println(objType)
-	fmt.Println(objValue)
 
 	for i := 0; i < objValue.NumField(); i++ {
 		switch objValue.Field(i).Kind() {
 		case reflect.Ptr:
 			objType = objType.Elem()
-			objValue = objValue.Field(i).Elem()
+			objValue = objValue.Elem()
 			fallthrough
 		case reflect.Struct:
-			if objName == objType.Field(i).Tag.Get(formatType) {
-				return objValue.Field(i).Interface()
-			}
+			configMap[objType.Field(i).Tag.Get(formatType)] = GetParams(objValue.Field(i).Interface(), formatType)
 		default:
-			if objName == objType.Field(i).Tag.Get(formatType) {
-				return objValue.Field(i)
-			}
+			configMap[objType.Field(i).Tag.Get(formatType)] = objValue.Field(i)
 		}
 	}
 
-	return nil
+	return configMap
 }
