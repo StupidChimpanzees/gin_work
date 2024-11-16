@@ -80,13 +80,15 @@ func Set(name string, value any) Params {
 
 func Get(name string) any {
 	strArr := strings.Split(name, ".")
-	for _, v := range strArr {
+	for k, v := range strArr {
 		if value, ok := config.Params[v]; !ok {
 			return nil
+		} else if k == len(strArr)-1 {
+			return value
 		} else if typeValue, ok := value.(map[string]any); ok {
 			config.Params = typeValue
 		} else {
-			return config.Params[v]
+			return nil
 		}
 	}
 	return nil

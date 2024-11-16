@@ -9,28 +9,30 @@ import (
 )
 
 type configMapping struct {
-	App      AppConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
-	Database DatabaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
-	Cache    CacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
-	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
-	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
-	View     ViewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
+	App      appConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
+	Database databaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
+	Cache    cacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
+	Cookie   cookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
+	Session  sessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
+	View     viewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
 }
 
-type AppConfiguration struct {
+type appConfiguration struct {
 	Name    string `yaml:"name" bson:"name" json:"name" xml:"name"`
 	Version string `yaml:"version" bson:"version" json:"version" xml:"version"`
 	Port    int    `yaml:"port" bson:"port" json:"port" xml:"port"`
 }
 
-type DatabaseConfiguration struct {
+type databaseConfiguration struct {
+	DBType   string `yaml:"db_type" bson:"db_type" json:"db_type" xml:"db_type"`
 	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
 	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
 	Username string `yaml:"username" bson:"username" json:"username" xml:"username"`
 	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
+	Name     string `yaml:"name" bson:"name" json:"name" xml:"name"`
 }
 
-type CacheConfiguration struct {
+type cacheConfiguration struct {
 	CType    string `yaml:"cache_type" bson:"cache_type" json:"cache_type" xml:"cache_type"`
 	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
 	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
@@ -39,7 +41,7 @@ type CacheConfiguration struct {
 	Timeout  int    `yaml:"timeout" bson:"timeout" json:"timeout" xml:"timeout"`
 }
 
-type CookieConfiguration struct {
+type cookieConfiguration struct {
 	Expire   int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
 	Path     string `yaml:"path" bson:"path" json:"path" xml:"path"`
 	Domain   string `yaml:"domain" bson:"domain" json:"domain" xml:"domain"`
@@ -47,13 +49,13 @@ type CookieConfiguration struct {
 	HttpOnly bool   `yaml:"http_only" bson:"http_only" json:"http_only" xml:"http_only"`
 }
 
-type SessionConfiguration struct {
+type sessionConfiguration struct {
 	Secret      string `yaml:"secret" bson:"secret" json:"secret" xml:"secret"`
 	Expire      int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
 	SessionName string `yaml:"session_name" bson:"session_name" json:"session_name" xml:"session_name"`
 }
 
-type ViewConfiguration struct {
+type viewConfiguration struct {
 	TempPath   string `yaml:"temp_path" bson:"temp_path" json:"temp_path" xml:"temp_path"`
 	StaticPath string `yaml:"static_path" bson:"static_path" json:"static_path" xml:"static_path"`
 	DelimBegin string `yaml:"delim_begin" bson:"delim_begin" json:"delim_begin" xml:"delim_begin"`
@@ -61,10 +63,6 @@ type ViewConfiguration struct {
 }
 
 var Mapping configMapping
-
-func init() {
-	Mapping = configMapping{}
-}
 
 func (configMapping) Parse(file string) error {
 	fileContent, _ := utils.GetSmallFileContent(file)
