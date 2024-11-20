@@ -3,11 +3,12 @@ package database
 import (
 	"fmt"
 	"go_custom/extend/config"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-type mysqlInstance struct {
+type mysqlConfig struct {
 	dbname    string
 	username  string
 	password  string
@@ -18,27 +19,32 @@ type mysqlInstance struct {
 	loc       string
 }
 
-func (mysqlInstance) getConfig() mysqlInstance {
+var MysqlInstance mysqlConfig
+
+func (mysqlConfig) getConfig() mysqlConfig {
 	dbc := config.Mapping.Database
-	return mysqlInstance{
+	return mysqlConfig{
 		dbname:    dbc.Name,
 		username:  dbc.Username,
 		password:  dbc.Password,
 		host:      dbc.Host,
 		port:      dbc.Port,
-		charset:   "utf8mb4",
+		charset:   dbc.Charset,
 		parseTime: true,
-		loc:       "local",
+		loc:       "Local",
 	}
 }
 
-func (mysqlInstance) dsn(username string, password string, host string, port int, dbname string) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=local", username, password, host, port, dbname)
+func (mysqlConfig) dsn(username string, password string, host string, port int,
+	dbname string, charset string, parsetime bool, local string) string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=%s",
+		username, password, host, port, dbname, charset, parsetime, local)
 }
 
-func (mysqlInstance) Open() error {
-	dbConfig := mysqlInstance.getConfig(mysqlInstance{})
-	dsn := mysqlInstance.dsn(mysqlInstance{}, dbConfig.username, dbConfig.password, dbConfig.host, dbConfig.port, dbConfig.dbname)
+func (mysqlConfig) Open() error {
+	MysqlInstance = mysqlConfig.getConfig(mysqlConfig{})
+	dsn := mysqlConfig.dsn(mysqlConfig{}, MysqlInstance.username, MysqlInstance.password, MysqlInstance.host,
+		MysqlInstance.port, MysqlInstance.dbname, MysqlInstance.charset, MysqlInstance.parseTime, MysqlInstance.loc)
 	SetDbLog()
 	dbInstance, err := gorm.Open(mysql.Open(dsn), &GConfig)
 	DB = dbInstance

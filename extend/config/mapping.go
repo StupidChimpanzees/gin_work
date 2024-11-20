@@ -30,6 +30,7 @@ type databaseConfiguration struct {
 	Username string `yaml:"username" bson:"username" json:"username" xml:"username"`
 	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
 	Name     string `yaml:"name" bson:"name" json:"name" xml:"name"`
+	Charset  string `yaml:"charset" bson:"charset" json:"charset" xml:"charset"`
 }
 
 type cacheConfiguration struct {

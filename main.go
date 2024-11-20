@@ -1,9 +1,16 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"go_custom/extend/config"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
+
+type User struct {
+	Name string
+	Age  int
+}
 
 func main() {
 	r := gin.Default()
@@ -14,11 +21,11 @@ func main() {
 		return
 	}
 
-	// 加载中间件
-
 	// 构建路由
 
-	err = r.Run(config.Get("app.port").(string))
+	// 加载中间件
+
+	err = r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
 	if err != nil {
 
 	}
