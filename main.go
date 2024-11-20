@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"go_custom/extend/config"
+	"go_custom/route"
+	"strconv"
 )
 
 func main() {
@@ -17,8 +19,9 @@ func main() {
 	// 加载中间件
 
 	// 构建路由
+	route.Route.Load(route.Route{}, r)
 
-	err = r.Run(config.Get("app.port").(string))
+	err = r.Run(strconv.Itoa(config.Mapping.App.Port))
 	if err != nil {
 
 	}
