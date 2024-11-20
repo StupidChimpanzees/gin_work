@@ -23,7 +23,8 @@ func main() {
 
 	// 构建路由
 
-	// 加载中间件
+	// 构建路由
+	route.Route.Load(route.Route{}, r)
 
 	err = r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
 	if err != nil {

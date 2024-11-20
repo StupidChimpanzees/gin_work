@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"go_custom/extend/utils"
+	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -63,12 +65,38 @@ type viewConfiguration struct {
 	DelimEnd   string `yaml:"delim_end" bson:"delim_end" json:"delim_end" xml:"delim_end"`
 }
 
+type configurationFile struct {
+	path     string
+	filename string
+	ext      string
+}
+
+var configFile *configurationFile
+
 var Mapping configMapping
+
+func (configurationFile) formatFilename(file string) {
+	file = strings.TrimSpace(file)
+	pathArr := strings.Split(file, string(os.PathSeparator))
+	var filename string
+	if len(pathArr) > 1 {
+		filename = pathArr[len(pathArr)-1]
+	} else {
+		filename = file
+	}
+	filenameArr := strings.Split(filename, ".")
+	if len(filenameArr) > 1 {
+		configFile.filename = filenameArr[len(filenameArr)-2]
+		configFile.ext = "." + filenameArr[len(filenameArr)-1]
+	} else {
+		configFile.filename = filenameArr[len(filenameArr)-1]
+	}
+}
 
 func (configMapping) Parse(file string) error {
 	fileContent, _ := utils.GetSmallFileContent(file)
 	var err error = nil
-	switch config.GetExt() {
+	switch configFile.ext {
 	case ".yaml", ".yml":
 		err = yaml.Unmarshal(fileContent, &Mapping)
 	case ".json":
@@ -87,4 +115,20 @@ func (configMapping) Parse(file string) error {
 
 func (configMapping) ParamsToConfig() map[string]any {
 	return utils.GetParams(Mapping, "yaml")
+}
+
+func Load(file string) error {
+	configFile.formatFilename(file)
+	var err error
+	if _, err = os.Stat(file); err != nil {
+		file = configFile.path + string(os.PathSeparator) + configFile.filename + configFile.ext
+		if _, err = os.Stat(file); err != nil {
+			return err
+		}
+	}
+	err = Mapping.Parse(file)
+	if err != nil {
+		return err
+	}
+	return nil
 }
