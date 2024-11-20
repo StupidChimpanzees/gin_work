@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"go_custom/extend/config"
+	"go_custom/wrap/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

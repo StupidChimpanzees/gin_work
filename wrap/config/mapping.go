@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"encoding/xml"
-	"go_custom/extend/utils"
+	"go_custom/wrap/utils"
 	"os"
 	"strings"
 
@@ -109,7 +109,6 @@ func (configMapping) Parse(file string) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
