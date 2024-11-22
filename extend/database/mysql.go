@@ -36,9 +36,9 @@ func (mysqlConfig) getConfig() mysqlConfig {
 }
 
 func (mysqlConfig) dsn(username string, password string, host string, port int,
-	dbname string, charset string, parsetime bool, local string) string {
+	dbname string, charset string, parseTime bool, local string) string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=%s",
-		username, password, host, port, dbname, charset, parsetime, local)
+		username, password, host, port, dbname, charset, parseTime, local)
 }
 
 func (mysqlConfig) Open() error {

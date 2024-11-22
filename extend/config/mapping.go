@@ -106,11 +106,7 @@ func (configMapping) Parse(file string) error {
 	case ".xml":
 		err = xml.Unmarshal(fileContent, &Mapping)
 	}
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (configMapping) ParamsToConfig() map[string]any {
@@ -126,9 +122,5 @@ func Load(file string) error {
 			return err
 		}
 	}
-	err = Mapping.Parse(file)
-	if err != nil {
-		return err
-	}
-	return nil
+	return Mapping.Parse(file)
 }
