@@ -1,21 +1,12 @@
 package main
 
 import (
-	"go_custom/extend/config"
-<<<<<<< HEAD
+	"go_custom/route"
+	"go_custom/wrap/config"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-=======
-	"go_custom/route"
-	"strconv"
->>>>>>> 47b650c38f3b1831b332d2e2b4e51bc3b0315afe
 )
-
-type User struct {
-	Name string
-	Age  int
-}
 
 func main() {
 	r := gin.Default()
@@ -25,9 +16,6 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	// 构建路由
-	route.Route.Load(route.Route{}, r)
 
 	// 构建路由
 	route.Route.Load(route.Route{}, r)
