@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-func Bind(r *gin.Engine) {
+func Load(r *gin.Engine) {
 	globalValue := reflect.ValueOf(middleware.GM)
 	for i := 0; i < globalValue.NumMethod(); i++ {
 		funcResult := globalValue.Method(i).Call(nil)

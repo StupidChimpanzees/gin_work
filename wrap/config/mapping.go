@@ -14,8 +14,8 @@ type configMapping struct {
 	App      appConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
 	Database databaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
 	Cache    cacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
-	Cookie   cookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
-	Session  sessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
+	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
+	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
 	View     viewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
 }
 
@@ -44,7 +44,7 @@ type cacheConfiguration struct {
 	Timeout  int    `yaml:"timeout" bson:"timeout" json:"timeout" xml:"timeout"`
 }
 
-type cookieConfiguration struct {
+type CookieConfiguration struct {
 	Expire   int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
 	Path     string `yaml:"path" bson:"path" json:"path" xml:"path"`
 	Domain   string `yaml:"domain" bson:"domain" json:"domain" xml:"domain"`
@@ -52,7 +52,7 @@ type cookieConfiguration struct {
 	HttpOnly bool   `yaml:"http_only" bson:"http_only" json:"http_only" xml:"http_only"`
 }
 
-type sessionConfiguration struct {
+type SessionConfiguration struct {
 	Secret      string `yaml:"secret" bson:"secret" json:"secret" xml:"secret"`
 	Expire      int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
 	SessionName string `yaml:"session_name" bson:"session_name" json:"session_name" xml:"session_name"`
@@ -87,7 +87,7 @@ func (configurationFile) formatFilename(file string) {
 	filenameArr := strings.Split(filename, ".")
 	if len(filenameArr) > 1 {
 		configFile.filename = filenameArr[len(filenameArr)-2]
-		configFile.ext = "." + filenameArr[len(filenameArr)-1]
+		configFile.ext = filenameArr[len(filenameArr)-1]
 	} else {
 		configFile.filename = filenameArr[len(filenameArr)-1]
 	}
@@ -97,13 +97,13 @@ func (configMapping) Parse(file string) error {
 	fileContent, _ := utils.GetSmallFileContent(file)
 	var err error = nil
 	switch configFile.ext {
-	case ".yaml", ".yml":
+	case "yaml", "yml":
 		err = yaml.Unmarshal(fileContent, &Mapping)
-	case ".json":
+	case "json":
 		err = json.Unmarshal(fileContent, &Mapping)
-	case ".bson":
+	case "bson":
 	// 空着先
-	case ".xml":
+	case "xml":
 		err = xml.Unmarshal(fileContent, &Mapping)
 	}
 	return err
@@ -117,7 +117,7 @@ func Load(file string) error {
 	configFile.formatFilename(file)
 	var err error
 	if _, err = os.Stat(file); err != nil {
-		file = configFile.path + string(os.PathSeparator) + configFile.filename + configFile.ext
+		file = configFile.path + string(os.PathSeparator) + configFile.filename + "." + configFile.ext
 		if _, err = os.Stat(file); err != nil {
 			return err
 		}

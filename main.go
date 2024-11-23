@@ -1,9 +1,12 @@
 package main
 
 import (
+	"github.com/gin-contrib/sessions"
 	"go_custom/route"
 	"go_custom/wrap/config"
+	"go_custom/wrap/cookie"
 	"go_custom/wrap/middleware"
+	"go_custom/wrap/session"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +22,12 @@ func main() {
 	}
 
 	// 加载全局中间件
-	middleware.Bind(r)
+	middleware.Load(r)
+
+	// 设置cookie和session配置
+	cookie.Load()
+	store := session.Load()
+	r.Use(sessions.Sessions("GlobalSession", store))
 
 	// 构建路由
 	route.Route.Load(route.Route{}, r)
