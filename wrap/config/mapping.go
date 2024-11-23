@@ -71,7 +71,7 @@ type configurationFile struct {
 	ext      string
 }
 
-var configFile *configurationFile
+var configFile configurationFile
 
 var Mapping configMapping
 

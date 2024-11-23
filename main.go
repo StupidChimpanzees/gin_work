@@ -3,6 +3,7 @@ package main
 import (
 	"go_custom/route"
 	"go_custom/wrap/config"
+	"go_custom/wrap/middleware"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,9 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	// 加载全局中间件
+	middleware.Bind(r)
 
 	// 构建路由
 	route.Route.Load(route.Route{}, r)

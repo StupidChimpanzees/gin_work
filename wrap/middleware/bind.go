@@ -1,12 +1,15 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"go_custom/middleware"
+	"reflect"
+)
 
-func init() {
-
-}
-
-func Bind(r *gin.Engine, global func() gin.HandlerFunc) {
-
-	r.Use(global())
+func Bind(r *gin.Engine) {
+	globalValue := reflect.ValueOf(middleware.GM)
+	for i := 0; i < globalValue.NumMethod(); i++ {
+		funcResult := globalValue.Method(i).Call(nil)
+		r.Use(funcResult[0].Interface().(gin.HandlerFunc))
+	}
 }
