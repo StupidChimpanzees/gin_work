@@ -4,8 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GlobalMiddleware struct {
-}
+type GlobalMiddleware struct{}
 
 var GM GlobalMiddleware
 

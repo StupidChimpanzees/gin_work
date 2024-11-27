@@ -13,7 +13,7 @@ import (
 type configMapping struct {
 	App      appConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
 	Database databaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
-	Cache    cacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
+	Cache    CacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
 	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
 	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
 	View     viewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
@@ -35,7 +35,7 @@ type databaseConfiguration struct {
 	Charset  string `yaml:"charset" bson:"charset" json:"charset" xml:"charset"`
 }
 
-type cacheConfiguration struct {
+type CacheConfiguration struct {
 	CType    string `yaml:"cache_type" bson:"cache_type" json:"cache_type" xml:"cache_type"`
 	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
 	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
