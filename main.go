@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/gin-contrib/sessions"
-	"go_custom/route"
-	"go_custom/wrap/config"
-	"go_custom/wrap/cookie"
-	"go_custom/wrap/middleware"
-	"go_custom/wrap/session"
+	"gin_work/route"
+	"gin_work/wrap/config"
+	"gin_work/wrap/cookie"
+	"gin_work/wrap/middleware"
+	"gin_work/wrap/session"
 	"strconv"
+
+	"github.com/gin-contrib/sessions"
 
 	"github.com/gin-gonic/gin"
 )

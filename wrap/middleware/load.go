@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"go_custom/middleware"
+	"gin_work/middleware"
 	"reflect"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Load(r *gin.Engine) {

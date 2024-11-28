@@ -1,8 +1,9 @@
 package cookie
 
 import (
+	"gin_work/wrap/config"
+
 	"github.com/gin-gonic/gin"
-	"go_custom/wrap/config"
 )
 
 type cookiePack struct {

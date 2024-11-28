@@ -1,10 +1,11 @@
 package session
 
 import (
+	"gin_work/wrap/config"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"go_custom/wrap/config"
 )
 
 var c *gin.Context

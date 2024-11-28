@@ -2,7 +2,8 @@ package cache
 
 import (
 	"encoding/json"
-	"go_custom/wrap/config"
+	"gin_work/wrap/config"
+	raede "gin_work/wrap/redis"
 	"strconv"
 
 	"github.com/gomodule/redigo/redis"
@@ -13,7 +14,16 @@ type Redis struct {
 	conn redis.Conn
 }
 
-var rCache Redis
+var (
+	rCache Redis
+	r      raede.Raede
+)
+
+func init() {
+	rCache.getConfig()
+	rCache.connRedis()
+	r.SelectDB(rCache.conn, 0)
+}
 
 func (Redis) getConfig() {
 	rCache.rc = config.Mapping.Cache
@@ -29,51 +39,38 @@ func (Redis) connRedis() error {
 	return err
 }
 
-func Load() (err error) {
-	rCache.getConfig()
-	err = rCache.connRedis()
-
-	return err
-}
-
 func Has(name string) bool {
-	exists, err := redis.Bool(rCache.conn.Do("EXISTS", rCache.rc.Prefix+name))
-	if err != nil {
-		return false
-	}
-	return exists
+	rCache.connRedis()
+	return r.Exists(rCache.conn, rCache.rc.Prefix+name)
 }
 
 func Get(name string, value *interface{}) bool {
-	str, err := redis.String(rCache.conn.Do("GET", rCache.rc.Prefix+name))
-	if err != nil {
+	rCache.connRedis()
+	str := r.Get(rCache.conn, rCache.rc.Prefix+name)
+	if str == "" {
 		return false
 	}
 	b := []byte(str)
 	instance := *value
-	err = json.Unmarshal(b, instance)
+	err := json.Unmarshal(b, instance)
 	if err != nil {
 		return false
 	}
 	return true
 }
 
-func Set(name string, args ...interface{}) bool {
-	if args == nil {
-		return false
+func Set(name string, value interface{}, args ...int) bool {
+	var timeout int = rCache.rc.Timeout
+	if args != nil {
+		timeout = args[0]
 	}
-	var err error
-	if len(args) == 2 {
-		_, err = rCache.conn.Do("EXPIRE", rCache.rc.Prefix+name, args[1])
+	b, err := json.Marshal(&value)
+	rCache.connRedis()
+	if timeout == 0 {
+		_, err = r.Set(rCache.conn, rCache.rc.Prefix+name, string(b))
 	} else {
-		_, err = rCache.conn.Do("EXPIRE", rCache.rc.Prefix+name, rCache.rc.Timeout)
+		_, err = r.Set(rCache.conn, rCache.rc.Prefix+name, string(b), rCache.rc.Timeout)
 	}
-	if err != nil {
-		return false
-	}
-	var b []byte
-	b, err = json.Marshal(&args[1])
-	_, err = rCache.conn.Do("SET", rCache.rc.Prefix+name, string(b))
 	if err != nil {
 		return false
 	}
@@ -81,17 +78,11 @@ func Set(name string, args ...interface{}) bool {
 }
 
 func Delete(name string) bool {
-	b, err := redis.Bool(rCache.conn.Do("DEL", rCache.rc.Prefix+name))
-	if err != nil {
-		return false
-	}
-	return b
+	rCache.connRedis()
+	return r.Del(rCache.conn, rCache.rc.Prefix+name)
 }
 
 func Clear() bool {
-	b, err := redis.Bool(rCache.conn.Do("FLUSHDB"))
-	if err != nil {
-		return false
-	}
-	return b
+	rCache.connRedis()
+	r.FlushDB(rCache.conn)
 }

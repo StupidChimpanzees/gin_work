@@ -16,12 +16,13 @@ cache:
   port: 6379
   password: ""
   prefix: ""
-  timeout: 3600
+  timeout: 0
 redis:
   host: 127.0.0.1
   port: 6379
   password: ""
   prefix: ""
+  select: 1
 cookie:
   expire: 604800
   path: "/"

@@ -1,78 +1,58 @@
 package redis
 
 import (
+	"gin_work/wrap/config"
+
 	"github.com/gomodule/redigo/redis"
-	"go_custom/wrap/config"
-	"strconv"
 )
 
-var rc config.RedisConfiguration
-
-func init() {
-	rc = getConfig()
+type Raede struct {
+	rc   config.RedisConfiguration
+	conn redis.Conn
 }
 
-func getConfig() config.RedisConfiguration {
-	return config.Mapping.Redis
-}
-
-func RConn() (redis.Conn, error) {
-	var conn redis.Conn
-	var err error
-	if rc.Password == "" {
-		conn, err = redis.Dial("tcp", rc.Host+":"+strconv.Itoa(rc.Port))
-	} else {
-		conn, err = redis.Dial("tcp", rc.Host+":"+strconv.Itoa(rc.Port), redis.DialPassword(rc.Password))
-	}
-	if err != nil {
-		panic("redis connection error: " + err.Error())
-	}
-	return conn, err
-}
-
-func rSet(conn redis.Conn, command string, name string, value interface{}, args ...interface{}) (bool, error) {
+func (Raede) rSet(conn redis.Conn, command string, name string, value interface{}, args ...interface{}) (bool, error) {
 	defer conn.Close()
 	if args != nil {
-		return redis.Bool(conn.Do(command, rc.Prefix+name, value, "EX", args[0]))
+		return redis.Bool(conn.Do(command, name, value, "EX", args[0]))
 	} else {
-		return redis.Bool(conn.Do(command, rc.Prefix+name, value))
+		return redis.Bool(conn.Do(command, name, value))
 	}
 }
 
-func rGet(conn redis.Conn, command string, name string) interface{} {
+func (Raede) rGet(conn redis.Conn, command string, name string) interface{} {
 	defer conn.Close()
-	if value, err := conn.Do(command, rc.Prefix+name); err == nil {
+	if value, err := conn.Do(command, name); err == nil {
 		return value
 	}
 	return nil
 }
 
-func SelectDB(conn redis.Conn, num int) error {
-	defer conn.Close()
+func (Raede) SelectDB(conn redis.Conn, num int) error {
 	_, err := redis.String(conn.Do("SELECT", num))
 	return err
 }
 
-func Set(conn redis.Conn, name, value string, args ...interface{}) (bool, error) {
-	return rSet(conn, "SET", name, value, args)
+func (Raede) Set(conn redis.Conn, name, value string, args ...interface{}) (bool, error) {
+	return r.rSet(conn, "SET", name, value, args...)
 }
 
-func Get(conn redis.Conn, name string) string {
-	return rGet(conn, "GET", name).(string)
+func (Raede) Get(conn redis.Conn, name string) string {
+	return r.rGet(conn, "GET", name).(string)
 }
 
-func HSet(conn redis.Conn, name string, value interface{}, args ...interface{}) (bool, error) {
-	return rSet(conn, "HSET", name, value, args)
+func (Raede) HSet(conn redis.Conn, name string, value interface{}, args ...interface{}) (bool, error) {
+	return r.rSet(conn, "HSET", name, value, args...)
 }
 
-func HGet(conn redis.Conn, name string) interface{} {
-	return rGet(conn, "HGET", name)
+func (Raede) HGet(conn redis.Conn, name string) interface{} {
+	return r.rGet(conn, "HGET", name)
 }
 
-func LPush(conn redis.Conn, name string, args ...interface{}) bool {
+func (Raede) LPush(conn redis.Conn, name string, args ...interface{}) bool {
 	defer conn.Close()
 	slice := make([]interface{}, 1)
-	slice[0] = rc.Prefix + name
+	slice[0] = name
 	values := append(slice, args...)
 	if b, err := redis.Bool(conn.Do("LPUSH", values...)); err == nil {
 		return b
@@ -80,22 +60,22 @@ func LPush(conn redis.Conn, name string, args ...interface{}) bool {
 	return false
 }
 
-func LPop(conn redis.Conn, name string) interface{} {
-	return rGet(conn, "LPOP", name)
+func (Raede) LPop(conn redis.Conn, name string) interface{} {
+	return r.rGet(conn, "LPOP", name)
 }
 
-func LRange(conn redis.Conn, name string, start int, stop int) []interface{} {
+func (Raede) LRange(conn redis.Conn, name string, start int, stop int) []interface{} {
 	defer conn.Close()
-	if v, err := redis.Values(conn.Do("LRANGE", rc.Prefix+name, start, stop)); err == nil {
+	if v, err := redis.Values(conn.Do("LRANGE", name, start, stop)); err == nil {
 		return v
 	}
 	return nil
 }
 
-func SAdd(conn redis.Conn, name string, args ...interface{}) bool {
+func (Raede) SAdd(conn redis.Conn, name string, args ...interface{}) bool {
 	defer conn.Close()
 	slice := make([]interface{}, 1)
-	slice[0] = rc.Prefix + name
+	slice[0] = name
 	values := append(slice, args...)
 	if b, err := redis.Bool(conn.Do("SADD", values...)); err == nil {
 		return b
@@ -103,30 +83,30 @@ func SAdd(conn redis.Conn, name string, args ...interface{}) bool {
 	return false
 }
 
-func SPop(conn redis.Conn, name string) interface{} {
+func (Raede) SPop(conn redis.Conn, name string) interface{} {
 	defer conn.Close()
-	if v, err := redis.Values(conn.Do("SPOP", rc.Prefix+name)); err == nil {
+	if v, err := redis.Values(conn.Do("SPOP", name)); err == nil {
 		return v
 	}
 	return nil
 }
 
-func ZAdd(conn redis.Conn, name string, key string, value string) bool {
+func (Raede) ZAdd(conn redis.Conn, name string, key string, value string) bool {
 	defer conn.Close()
-	if b, err := redis.Bool(conn.Do("ZADD", rc.Prefix+name, key, value)); err == nil {
+	if b, err := redis.Bool(conn.Do("ZADD", name, key, value)); err == nil {
 		return b
 	}
 	return false
 }
 
-func ZRange(conn redis.Conn, name string, start int, stop int, args ...bool) []interface{} {
+func (Raede) ZRange(conn redis.Conn, name string, start int, stop int, args ...bool) []interface{} {
 	defer conn.Close()
 	var v []interface{}
 	var err error
-	if args != nil {
-		v, err = redis.Values(conn.Do("ZRANGE", rc.Prefix+name, start, stop, "WITHSCORES"))
+	if args != nil && args[0] == true {
+		v, err = redis.Values(conn.Do("ZRANGE", name, start, stop, "WITHSCORES"))
 	} else {
-		v, err = redis.Values(conn.Do("ZRANGE", rc.Prefix+name, start, stop))
+		v, err = redis.Values(conn.Do("ZRANGE", name, start, stop))
 	}
 	if err != nil {
 		return nil
@@ -134,18 +114,35 @@ func ZRange(conn redis.Conn, name string, start int, stop int, args ...bool) []i
 	return v
 }
 
-func ZScore(conn redis.Conn, name string, key string) interface{} {
+func (Raede) ZScore(conn redis.Conn, name string, key string) interface{} {
 	defer conn.Close()
-	if v, err := redis.Values(conn.Do("ZSCORE", rc.Prefix+name, key)); err == nil {
+	if v, err := redis.Values(conn.Do("ZSCORE", name, key)); err == nil {
 		return v
 	}
 	return nil
 }
 
-func Exists(conn redis.Conn, name string) bool {
+func (Raede) Exists(conn redis.Conn, name string) bool {
 	defer conn.Close()
 	if exists, err := redis.Bool(conn.Do("EXISTS", name)); err == nil {
 		return exists
 	}
 	return false
+}
+
+func (Raede) Del(conn redis.Conn, name string) bool {
+	defer conn.Close()
+	if b, err := redis.Bool(conn.Do("DEL", name)); err == nil {
+		return b
+	}
+	return false
+}
+
+func (Raede) FlushDB(conn redis.Conn) bool {
+	defer conn.Close()
+	b, err := redis.Bool(conn.Do("FLUSHDB"))
+	if err != nil {
+		return false
+	}
+	return b
 }

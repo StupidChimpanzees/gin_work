@@ -1,8 +1,9 @@
 package redis
 
 import (
-	"github.com/gomodule/redigo/redis"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 var pool *redis.Pool
@@ -10,15 +11,15 @@ var pool *redis.Pool
 func init() {
 	maxIdle := 10
 	maxActive := 100
-	var idleTimeout time.Duration = 0
-	if rc.MaxIdle != 0 {
-		maxIdle = rc.MaxIdle
+	idleTimeout := time.Duration(3)
+	if r.rc.MaxIdle != 0 {
+		maxIdle = r.rc.MaxIdle
 	}
-	if rc.MaxActive != 0 {
-		maxActive = rc.MaxActive
+	if r.rc.MaxActive != 0 {
+		maxActive = r.rc.MaxActive
 	}
-	if rc.IdleTimeout != 0 {
-		idleTimeout = time.Duration(rc.IdleTimeout)
+	if r.rc.IdleTimeout != 0 {
+		idleTimeout = time.Duration(r.rc.IdleTimeout)
 	}
 	pool = &redis.Pool{
 		Dial: func() (redis.Conn, error) {

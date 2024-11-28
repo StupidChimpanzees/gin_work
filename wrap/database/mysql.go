@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"go_custom/wrap/config"
+	"gin_work/wrap/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

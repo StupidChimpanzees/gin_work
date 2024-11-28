@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"encoding/xml"
-	"go_custom/wrap/utils"
+	"gin_work/wrap/utils"
 	"os"
 	"strings"
 
@@ -50,6 +50,7 @@ type RedisConfiguration struct {
 	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
 	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
 	Prefix   string `yaml:"prefix" bson:"prefix" json:"prefix" xml:"prefix"`
+	Select   int    `yaml:"select" bson:"select" json:"select" xml:"select"`
 	RedisPoolConfiguration
 }
 

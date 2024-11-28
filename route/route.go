@@ -1,8 +1,9 @@
 package route
 
 import (
+	"gin_work/controller"
+
 	"github.com/gin-gonic/gin"
-	"go_custom/controller"
 )
 
 type Route struct{}

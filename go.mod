@@ -1,4 +1,4 @@
-module go_custom
+module gin_work
 
 go 1.23
 
