@@ -14,6 +14,7 @@ type configMapping struct {
 	App      appConfiguration      `yaml:"app" bson:"app" json:"app" xml:"app"`
 	Database databaseConfiguration `yaml:"database" bson:"database" json:"database" xml:"database"`
 	Cache    CacheConfiguration    `yaml:"cache" bson:"cache" json:"cache" xml:"cache"`
+	Redis    RedisConfiguration    `yaml:"redis" bson:"redis" json:"redis" xml:"redis"`
 	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
 	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
 	View     viewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
@@ -42,6 +43,20 @@ type CacheConfiguration struct {
 	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
 	Prefix   string `yaml:"prefix" bson:"prefix" json:"prefix" xml:"prefix"`
 	Timeout  int    `yaml:"timeout" bson:"timeout" json:"timeout" xml:"timeout"`
+}
+
+type RedisConfiguration struct {
+	Host     string `yaml:"host" bson:"host" json:"host" xml:"host"`
+	Port     int    `yaml:"port" bson:"port" json:"port" xml:"port"`
+	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
+	Prefix   string `yaml:"prefix" bson:"prefix" json:"prefix" xml:"prefix"`
+	RedisPoolConfiguration
+}
+
+type RedisPoolConfiguration struct {
+	MaxIdle     int `yaml:"max_idle" bson:"max_idle" json:"max_idle" xml:"max_idle"`
+	MaxActive   int `yaml:"max_active" bson:"max_active" json:"max_active" xml:"max_active"`
+	IdleTimeout int `yaml:"idle_timeout" bson:"idle_timeout" json:"idle_timeout" xml:"idle_timeout"`
 }
 
 type CookieConfiguration struct {

@@ -14,7 +14,14 @@ cache:
   cache_type: "redis"
   host: 127.0.0.1
   port: 6379
+  password: ""
+  prefix: ""
   timeout: 3600
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  prefix: ""
 cookie:
   expire: 604800
   path: "/"
