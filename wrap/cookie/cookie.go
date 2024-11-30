@@ -7,22 +7,32 @@ import (
 )
 
 type cookiePack struct {
-	conf config.CookieConfiguration
+	Expire   int
+	Path     string
+	Domain   string
+	Secure   bool
+	HttpOnly bool
 }
 
 var cPack *cookiePack
 
 func Load() {
-	cPack.conf = getConfig()
+	cPack = getConfig()
 }
 
-func getConfig() config.CookieConfiguration {
-	return config.Mapping.Cookie
+func getConfig() *cookiePack {
+	conf := config.Mapping.Cookie
+	return &cookiePack{
+		Expire:   conf.Expire,
+		Path:     conf.Path,
+		Domain:   conf.Domain,
+		Secure:   conf.Secure,
+		HttpOnly: conf.HttpOnly,
+	}
 }
 
 func Set(c *gin.Context, name, value string) {
-	cc := cPack.conf
-	c.SetCookie(name, value, cc.Expire, cc.Path, cc.Domain, cc.Secure, cc.HttpOnly)
+	c.SetCookie(name, value, cPack.Expire, cPack.Path, cPack.Domain, cPack.Secure, cPack.HttpOnly)
 }
 
 func Get(c *gin.Context, name string) (string, error) {
@@ -30,6 +40,5 @@ func Get(c *gin.Context, name string) (string, error) {
 }
 
 func Delete(c *gin.Context, name string) {
-	cc := cPack.conf
-	c.SetCookie(name, "", -1, cc.Path, cc.Domain, cc.Secure, cc.HttpOnly)
+	c.SetCookie(name, "", -1, cPack.Path, cPack.Domain, cPack.Secure, cPack.HttpOnly)
 }

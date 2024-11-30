@@ -51,13 +51,14 @@ type RedisConfiguration struct {
 	Password string `yaml:"password" bson:"password" json:"password" xml:"password"`
 	Prefix   string `yaml:"prefix" bson:"prefix" json:"prefix" xml:"prefix"`
 	Select   int    `yaml:"select" bson:"select" json:"select" xml:"select"`
-	RedisPoolConfiguration
+	Pool     RedisPoolConfiguration
 }
 
 type RedisPoolConfiguration struct {
-	MaxIdle     int `yaml:"max_idle" bson:"max_idle" json:"max_idle" xml:"max_idle"`
-	MaxActive   int `yaml:"max_active" bson:"max_active" json:"max_active" xml:"max_active"`
-	IdleTimeout int `yaml:"idle_timeout" bson:"idle_timeout" json:"idle_timeout" xml:"idle_timeout"`
+	MaxIdle        int `yaml:"max_idle" bson:"max_idle" json:"max_idle" xml:"max_idle"`
+	MaxActive      int `yaml:"max_active" bson:"max_active" json:"max_active" xml:"max_active"`
+	IdleTimeout    int `yaml:"idle_timeout" bson:"idle_timeout" json:"idle_timeout" xml:"idle_timeout"`
+	MaxConnTimeout int `yaml:"max_conn_timeout" bson:"max_conn_timeout" json:"max_conn_timeout" xml:"max_conn_timeout"`
 }
 
 type CookieConfiguration struct {
@@ -90,6 +91,10 @@ type configurationFile struct {
 var configFile configurationFile
 
 var Mapping configMapping
+
+func init() {
+	Load("config.yaml")
+}
 
 func (configurationFile) formatFilename(file string) {
 	file = strings.TrimSpace(file)

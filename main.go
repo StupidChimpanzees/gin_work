@@ -25,7 +25,7 @@ func main() {
 	// 加载全局中间件
 	middleware.Load(r)
 
-	// 设置cookie和session配置
+	// 加载cookie和session配置
 	cookie.Load()
 	store := session.Load()
 	r.Use(sessions.Sessions("GlobalSession", store))
