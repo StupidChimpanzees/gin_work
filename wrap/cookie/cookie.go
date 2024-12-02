@@ -6,14 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type cookiePack struct {
-	conf config.CookieConfiguration
-}
-
-var cPack *cookiePack
+var cPack config.CookieConfiguration
 
 func Load() {
-	cPack.conf = getConfig()
+	cPack = getConfig()
 }
 
 func getConfig() config.CookieConfiguration {
@@ -21,7 +17,7 @@ func getConfig() config.CookieConfiguration {
 }
 
 func Set(c *gin.Context, name, value string) {
-	cc := cPack.conf
+	cc := cPack
 	c.SetCookie(name, value, cc.Expire, cc.Path, cc.Domain, cc.Secure, cc.HttpOnly)
 }
 
@@ -30,6 +26,6 @@ func Get(c *gin.Context, name string) (string, error) {
 }
 
 func Delete(c *gin.Context, name string) {
-	cc := cPack.conf
+	cc := cPack
 	c.SetCookie(name, "", -1, cc.Path, cc.Domain, cc.Secure, cc.HttpOnly)
 }

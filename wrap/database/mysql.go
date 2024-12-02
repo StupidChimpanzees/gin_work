@@ -19,11 +19,11 @@ type mysqlConfig struct {
 	loc       string
 }
 
-var MysqlInstance mysqlConfig
+var MysqlInstance *mysqlConfig
 
-func (mysqlConfig) getConfig() mysqlConfig {
+func (*mysqlConfig) getConfig() *mysqlConfig {
 	dbc := config.Mapping.Database
-	return mysqlConfig{
+	return &mysqlConfig{
 		dbname:    dbc.Name,
 		username:  dbc.Username,
 		password:  dbc.Password,
@@ -35,15 +35,15 @@ func (mysqlConfig) getConfig() mysqlConfig {
 	}
 }
 
-func (mysqlConfig) dsn(username string, password string, host string, port int,
+func (*mysqlConfig) dsn(username string, password string, host string, port int,
 	dbname string, charset string, parseTime bool, local string) string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=%s",
 		username, password, host, port, dbname, charset, parseTime, local)
 }
 
-func (mysqlConfig) Open() error {
-	MysqlInstance = mysqlConfig.getConfig(mysqlConfig{})
-	dsn := mysqlConfig.dsn(mysqlConfig{}, MysqlInstance.username, MysqlInstance.password, MysqlInstance.host,
+func (m *mysqlConfig) Open() error {
+	MysqlInstance = m.getConfig()
+	dsn := m.dsn(MysqlInstance.username, MysqlInstance.password, MysqlInstance.host,
 		MysqlInstance.port, MysqlInstance.dbname, MysqlInstance.charset, MysqlInstance.parseTime, MysqlInstance.loc)
 	SetDbLog()
 	dbInstance, err := gorm.Open(mysql.Open(dsn), &GConfig)
