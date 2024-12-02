@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"gin_work/wrap/config"
+	"log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -41,12 +42,14 @@ func (*mysqlConfig) dsn(username string, password string, host string, port int,
 		username, password, host, port, dbname, charset, parseTime, local)
 }
 
-func (m *mysqlConfig) Open() error {
+func (m *mysqlConfig) Open() {
 	MysqlInstance = m.getConfig()
 	dsn := m.dsn(MysqlInstance.username, MysqlInstance.password, MysqlInstance.host,
 		MysqlInstance.port, MysqlInstance.dbname, MysqlInstance.charset, MysqlInstance.parseTime, MysqlInstance.loc)
 	SetDbLog()
 	dbInstance, err := gorm.Open(mysql.Open(dsn), &GConfig)
+	if err != nil {
+		log.Fatalf("Failed to connect to the database: %v", err)
+	}
 	DB = dbInstance
-	return err
 }
