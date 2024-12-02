@@ -3,7 +3,7 @@ package cache
 import (
 	"encoding/json"
 	"gin_work/wrap/config"
-	raede "gin_work/wrap/driver/redis"
+	driver2 "gin_work/wrap/driver"
 )
 
 type cache struct {
@@ -16,14 +16,14 @@ type cache struct {
 }
 
 var (
-	rCache *cache
-	device interface{}
+	Cache  *cache
+	driver driver2.Driver
 )
 
 func init() {
-	rCache = getConfig()
-	if rCache.CType == "redis" {
-		device = raede.NewRaede(rCache.Host, rCache.Port, rCache.Password, rCache.Prefix, 0)
+	Cache = getConfig()
+	if Cache.CType == "redis" {
+		driver = driver2.NewReads(Cache.Host, Cache.Port, Cache.Password, Cache.Prefix, 0)
 	}
 }
 
@@ -39,45 +39,55 @@ func getConfig() *cache {
 	}
 }
 
-func Has(name string) bool {
-	return device.(*raede.Raede).Exists(rCache.Prefix + name)
+func Has(name string) (bool, error) {
+	return driver.Exists(Cache.Prefix + name)
 }
 
-func Get(name string) any {
-	str := device.(*raede.Raede).Get(rCache.Prefix + name)
-	if str == "" {
-		return nil
+func BindGet(name string, value interface{}) error {
+	str, err := driver.Get(Cache.Prefix + name)
+	if err != nil || str == "" {
+		return err
 	}
 	b := []byte(str)
-	var instance any
-	err := json.Unmarshal(b, &instance)
-	if err != nil {
-		return nil
-	}
-	return instance
+	err = json.Unmarshal(b, &value)
+	return err
 }
 
-func Set(name string, value interface{}, args ...int) bool {
-	timeout := rCache.Timeout
+func AnyGet(name string) (interface{}, error) {
+	str, err := driver.Get(Cache.Prefix + name)
+	if err != nil || str == "" {
+		return nil, err
+	}
+	b := []byte(str)
+	var instance interface{}
+	err = json.Unmarshal(b, &instance)
+	if err != nil {
+		return nil, err
+	}
+	return instance, nil
+}
+
+func Set(name string, value interface{}, args ...int) (bool, error) {
+	timeout := Cache.Timeout
 	if args != nil {
 		timeout = args[0]
 	}
 	b, err := json.Marshal(&value)
 	if timeout == 0 {
-		_, err = device.(*raede.Raede).Set(rCache.Prefix+name, string(b))
+		_, err = driver.Set(Cache.Prefix+name, string(b))
 	} else {
-		_, err = device.(*raede.Raede).Set(rCache.Prefix+name, string(b), rCache.Timeout)
+		_, err = driver.Set(Cache.Prefix+name, string(b), timeout)
 	}
 	if err != nil {
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
-func Delete(name string) bool {
-	return device.(*raede.Raede).Del(rCache.Prefix + name)
+func Del(name string) (bool, error) {
+	return driver.Del(Cache.Prefix + name)
 }
 
-func Clear() bool {
-	return device.(*raede.Raede).Clear()
+func Clear() (bool, error) {
+	return driver.Clear()
 }

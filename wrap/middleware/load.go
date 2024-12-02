@@ -8,7 +8,7 @@ import (
 )
 
 func Load(r *gin.Engine) {
-	globalValue := reflect.ValueOf(middleware.GM)
+	globalValue := reflect.ValueOf(middleware.GlobalMiddleware{})
 	for i := 0; i < globalValue.NumMethod(); i++ {
 		funcResult := globalValue.Method(i).Call(nil)
 		r.Use(funcResult[0].Interface().(gin.HandlerFunc))

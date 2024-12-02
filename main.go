@@ -1,11 +1,12 @@
 package main
 
 import (
-	"gin_work/route"
 	"gin_work/wrap/config"
 	"gin_work/wrap/cookie"
 	"gin_work/wrap/middleware"
+	"gin_work/wrap/route"
 	"gin_work/wrap/session"
+	"log"
 	"strconv"
 
 	"github.com/gin-contrib/sessions"
@@ -31,10 +32,10 @@ func main() {
 	r.Use(sessions.Sessions("GlobalSession", store))
 
 	// 构建路由
-	route.Route.Load(route.Route{}, r)
+	route.Load(r)
 
 	err = r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
 	if err != nil {
-
+		log.Fatalf("error info: " + err.Error())
 	}
 }

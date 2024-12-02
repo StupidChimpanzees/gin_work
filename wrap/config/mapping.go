@@ -55,10 +55,11 @@ type RedisConfiguration struct {
 }
 
 type RedisPoolConfiguration struct {
-	MaxIdle        int `yaml:"max_idle" bson:"max_idle" json:"max_idle" xml:"max_idle"`
-	MaxActive      int `yaml:"max_active" bson:"max_active" json:"max_active" xml:"max_active"`
-	IdleTimeout    int `yaml:"idle_timeout" bson:"idle_timeout" json:"idle_timeout" xml:"idle_timeout"`
-	MaxConnTimeout int `yaml:"max_conn_timeout" bson:"max_conn_timeout" json:"max_conn_timeout" xml:"max_conn_timeout"`
+	Enable         bool `yaml:"enable" bson:"enable" json:"enable" xml:"enable"`
+	MaxIdle        int  `yaml:"max_idle" bson:"max_idle" json:"max_idle" xml:"max_idle"`
+	MaxActive      int  `yaml:"max_active" bson:"max_active" json:"max_active" xml:"max_active"`
+	IdleTimeout    int  `yaml:"idle_timeout" bson:"idle_timeout" json:"idle_timeout" xml:"idle_timeout"`
+	MaxConnTimeout int  `yaml:"max_conn_timeout" bson:"max_conn_timeout" json:"max_conn_timeout" xml:"max_conn_timeout"`
 }
 
 type CookieConfiguration struct {
@@ -93,7 +94,7 @@ var configFile configurationFile
 var Mapping configMapping
 
 func init() {
-	Load("config.yaml")
+	_ = Load("config.yaml")
 }
 
 func (configurationFile) formatFilename(file string) {
