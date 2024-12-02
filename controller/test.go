@@ -44,6 +44,5 @@ func Test(c *gin.Context) {
 	}
 
 	result := map[string]any{"plan_info": planInfo, "cache": get, "bind": params}
-	r := response.Response{}
-	c.JSON(http.StatusOK, r.Success(result))
+	c.JSON(response.Success(result))
 }
