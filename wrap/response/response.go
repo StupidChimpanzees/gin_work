@@ -6,12 +6,8 @@ type Response struct {
 	Message string      `json:"message" yaml:"message" xml:"message" bson:"message"`
 }
 
-func (*Response) Success(args ...interface{}) *Response {
-	response := &Response{
-		Code:    200,
-		Data:    nil,
-		Message: "Success",
-	}
+func (r *Response) Success(args ...interface{}) *Response {
+	response := r.response(200, "Success", nil)
 	if args != nil {
 		if len(args) > 2 {
 			response.Data = args[0]
@@ -27,12 +23,8 @@ func (*Response) Success(args ...interface{}) *Response {
 	return response
 }
 
-func (*Response) Fail(args ...interface{}) *Response {
-	response := &Response{
-		Code:    500,
-		Data:    nil,
-		Message: "Fail",
-	}
+func (r *Response) Fail(args ...interface{}) *Response {
+	response := r.response(500, "Fail", nil)
 	if args != nil {
 		if len(args) > 2 {
 			response.Message = args[0].(string)
@@ -46,4 +38,12 @@ func (*Response) Fail(args ...interface{}) *Response {
 		}
 	}
 	return response
+}
+
+func (*Response) response(code int, message string, data interface{}) *Response {
+	return &Response{
+		Code:    code,
+		Data:    data,
+		Message: message,
+	}
 }

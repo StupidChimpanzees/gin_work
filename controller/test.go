@@ -3,6 +3,7 @@ package controller
 import (
 	"gin_work/model"
 	"gin_work/wrap/cache"
+	"gin_work/wrap/response"
 	"net/http"
 	"strconv"
 
@@ -43,5 +44,6 @@ func Test(c *gin.Context) {
 	}
 
 	result := map[string]any{"plan_info": planInfo, "cache": get, "bind": params}
-	c.JSON(http.StatusOK, gin.H{"status": "200", "data": result})
+	r := response.Response{}
+	c.JSON(http.StatusOK, r.Success(result))
 }
