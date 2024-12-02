@@ -3,9 +3,10 @@ package controller
 import (
 	"gin_work/model"
 	"gin_work/wrap/cache"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TestParams struct {
@@ -35,7 +36,7 @@ func Test(c *gin.Context) {
 		return
 	}
 
-	get, err := cache.AnyGet("test")
+	get, err := cache.Get("test")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

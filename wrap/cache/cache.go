@@ -53,7 +53,7 @@ func BindGet(name string, value interface{}) error {
 	return err
 }
 
-func AnyGet(name string) (interface{}, error) {
+func Get(name string) (interface{}, error) {
 	str, err := driver.Get(Cache.Prefix + name)
 	if err != nil || str == "" {
 		return nil, err
