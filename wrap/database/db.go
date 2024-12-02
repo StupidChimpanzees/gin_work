@@ -8,7 +8,7 @@ import (
 type dbInterface interface {
 	dsn(username string, password string, host string, port int,
 		dbname string, charset string, parseTime bool, local string) string
-	Open() error
+	Open()
 }
 
 var GConfig gorm.Config
@@ -16,16 +16,13 @@ var GConfig gorm.Config
 var DB *gorm.DB
 
 func init() {
-	err := LoadDB(MysqlInstance)
-	if err != nil {
-		return
-	}
+	LoadDB(MysqlInstance)
+}
+
+func LoadDB(db dbInterface) {
+	db.Open()
 }
 
 func SetDbLog() {
 	GConfig.Logger = logger.Default.LogMode(logger.Info)
-}
-
-func LoadDB(db dbInterface) error {
-	return db.Open()
 }

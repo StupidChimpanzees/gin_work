@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,4 +19,8 @@ func (GlobalMiddleware) Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 	}
+}
+
+func (GlobalMiddleware) Cors() gin.HandlerFunc {
+	return cors.Default()
 }

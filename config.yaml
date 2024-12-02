@@ -1,10 +1,11 @@
 app:
   name: "test"
   version: "1.0.0"
-  port: 80
+  port: 8081
+
 database:
   db_type: "mysql"
-  name: "test"
+  name: "jmk_server_test"
   host: 127.0.0.1
   port: 3306
   username: "root"

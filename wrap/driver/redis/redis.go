@@ -182,6 +182,33 @@ func (r *Raede) Clear() bool {
 	return b
 }
 
+func (r *Raede) Multi() bool {
+	conn := r.getConnection()
+	b, err := redis.Bool(conn.Do("MULTI"))
+	if err != nil {
+		return false
+	}
+	return b
+}
+
+func (r *Raede) Exec() bool {
+	conn := r.getConnection()
+	b, err := redis.Bool(conn.Do("EXEC"))
+	if err != nil {
+		return false
+	}
+	return b
+}
+
+func (r *Raede) Discard() bool {
+	conn := r.getConnection()
+	b, err := redis.Bool(conn.Do("DISCARD"))
+	if err != nil {
+		return false
+	}
+	return b
+}
+
 func (*Raede) Close(conn redis.Conn) {
 	raeder.Conn = nil
 	err := conn.Close()
