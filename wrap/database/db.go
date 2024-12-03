@@ -25,13 +25,13 @@ type dbConfig struct {
 }
 
 var DBConfig *dbConfig
-
 var DB *gorm.DB
 
 func init() {
 	DBConfig = getConfig()
 	if DBConfig.DBType == "mysql" {
-		MysqlInstance.Open()
+		mysql := MysqlConf{}
+		mysql.Open()
 	}
 }
 
