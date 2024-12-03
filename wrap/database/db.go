@@ -1,6 +1,7 @@
 package database
 
 import (
+	"gin_work/wrap/config"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -11,18 +12,44 @@ type dbInterface interface {
 	Open()
 }
 
-var GConfig gorm.Config
+type dbConfig struct {
+	DBType    string
+	DBName    string
+	Username  string
+	Password  string
+	Host      string
+	Port      int
+	Charset   string
+	ParseTime bool
+	Loc       string
+}
+
+var DBConfig *dbConfig
 
 var DB *gorm.DB
 
 func init() {
-	LoadDB(MysqlInstance)
+	DBConfig = getConfig()
+	if DBConfig.DBType == "mysql" {
+		MysqlInstance.Open()
+	}
 }
 
-func LoadDB(db dbInterface) {
-	db.Open()
+func getConfig() *dbConfig {
+	dbc := config.Mapping.Database
+	return &dbConfig{
+		DBType:    dbc.DBType,
+		DBName:    dbc.Name,
+		Username:  dbc.Username,
+		Password:  dbc.Password,
+		Host:      dbc.Host,
+		Port:      dbc.Port,
+		Charset:   dbc.Charset,
+		ParseTime: true,
+		Loc:       "Local",
+	}
 }
 
-func SetDbLog() {
-	GConfig.Logger = logger.Default.LogMode(logger.Info)
+func SetDbLog(conf *gorm.Config) {
+	conf.Logger = logger.Default.LogMode(logger.Info)
 }

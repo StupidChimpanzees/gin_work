@@ -44,10 +44,11 @@ func (*mysqlConfig) dsn(username string, password string, host string, port int,
 
 func (m *mysqlConfig) Open() {
 	MysqlInstance = m.getConfig()
+	conf := gorm.Config{}
 	dsn := m.dsn(MysqlInstance.username, MysqlInstance.password, MysqlInstance.host,
 		MysqlInstance.port, MysqlInstance.dbname, MysqlInstance.charset, MysqlInstance.parseTime, MysqlInstance.loc)
-	SetDbLog()
-	dbInstance, err := gorm.Open(mysql.Open(dsn), &GConfig)
+	SetDbLog(&conf)
+	dbInstance, err := gorm.Open(mysql.Open(dsn), &conf)
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
