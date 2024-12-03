@@ -1,7 +1,7 @@
 app:
   name: "test"
   version: "1.0.0"
-  port: 8081
+  port: 8082
 
 database:
   db_type: "mysql"
@@ -37,6 +37,6 @@ session:
   session_name: "session_8621E"
 view:
   temp_path: "public/template/**/*"
-  static_path: "public/static"
+  static_path: "public/assets"
   delim_begin: "{{"
   delim_end: "}}"

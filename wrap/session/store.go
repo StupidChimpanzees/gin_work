@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var c *gin.Context
-
 func Load() cookie.Store {
 	return cookie.NewStore([]byte(getConfig().Secret))
 }
@@ -18,28 +16,24 @@ func getConfig() config.SessionConfiguration {
 	return config.Mapping.Session
 }
 
-func SetContext(context *gin.Context) {
-	c = context
-}
-
-func Set(name string, value interface{}) error {
-	session := sessions.Default(c)
+func Set(context *gin.Context, name string, value interface{}) error {
+	session := sessions.Default(context)
 	session.Options(sessions.Options{MaxAge: getConfig().Expire})
 	session.Set(name, value)
 	return session.Save()
 }
 
-func Get(name string) interface{} {
-	session := sessions.Default(c)
+func Get(context *gin.Context, name string) interface{} {
+	session := sessions.Default(context)
 	return session.Get(name)
 }
 
-func Delete(name string) {
-	session := sessions.Default(c)
+func Delete(context *gin.Context, name string) {
+	session := sessions.Default(context)
 	session.Delete(name)
 }
 
-func Clear() {
-	session := sessions.Default(c)
+func Clear(context *gin.Context) {
+	session := sessions.Default(context)
 	session.Clear()
 }

@@ -28,14 +28,14 @@ var DBConfig *dbConfig
 var DB *gorm.DB
 
 func init() {
-	DBConfig = getConfig()
+	DBConfig = NewDBConfig()
 	if DBConfig.DBType == "mysql" {
 		mysql := MysqlConf{}
 		mysql.Open()
 	}
 }
 
-func getConfig() *dbConfig {
+func NewDBConfig() *dbConfig {
 	dbc := config.Mapping.Database
 	return &dbConfig{
 		DBType:    dbc.DBType,

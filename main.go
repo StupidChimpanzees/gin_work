@@ -31,9 +31,14 @@ func main() {
 	store := session.Load()
 	r.Use(sessions.Sessions("GlobalSession", store))
 
+	// 加载view配置
+	// 目录下必须有.html文件才能使用
+	// view.Load(r)
+
 	// 构建路由
 	route.Load(r)
 
+	// autotls.Run(r, "example1.com")
 	err = r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
 	if err != nil {
 		log.Fatalf("error info: " + err.Error())

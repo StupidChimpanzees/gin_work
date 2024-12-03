@@ -8,7 +8,7 @@ import (
 
 type Route struct{}
 
-func (Route) Load(r *gin.Engine) {
+func (*Route) Load(r *gin.Engine) {
 	r.GET("/index", controller.Index)
 	r.GET("/test", controller.Test)
 }

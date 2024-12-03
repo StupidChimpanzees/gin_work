@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type storagePlanModel struct {
+type StoragePlanModel struct {
 	Id             int           `gorm:"primaryKey"`
 	Name           string        `gorm:"column:name;"`
 	GoodsId        int           `gorm:"column:goods_id;"`
@@ -25,16 +25,14 @@ type storagePlanModel struct {
 	DriverSign     string        `gorm:"column:driver_sign;"`
 }
 
-var StoragePlanModel *storagePlanModel
-
-func (*storagePlanModel) TableName() string {
+func (*StoragePlanModel) TableName() string {
 	return "jmk_storage_plan"
 }
 
-func (*storagePlanModel) FindJoinById(id int) (*storagePlanModel, error) {
-	result := database.DB.Find(&StoragePlanModel, id)
+func (r *StoragePlanModel) FindJoinById(id int) (*StoragePlanModel, error) {
+	result := database.DB.Find(&r, id)
 	if result.Error != nil {
-		return nil, result.Error
+		return r, result.Error
 	}
-	return StoragePlanModel, nil
+	return r, nil
 }
