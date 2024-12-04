@@ -7,7 +7,8 @@ import (
 )
 
 func Load(r *gin.Engine) {
-	routeType := reflect.ValueOf(route.Route{})
+	var router *route.Route
+	routeType := reflect.ValueOf(router)
 	routeValue := []reflect.Value{reflect.ValueOf(r)}
 	for i := 0; i < routeType.NumMethod(); i++ {
 		routeType.Method(i).Call(routeValue)
