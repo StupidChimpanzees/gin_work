@@ -14,5 +14,5 @@ func (*Route) Load(r *gin.Engine) {
 }
 
 func (*Route) Login(r *gin.Engine) {
-	r.POST("/login", controller.Login)
+	r.POST("/login", controller.UserLogin)
 }

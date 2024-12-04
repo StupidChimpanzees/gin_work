@@ -1,13 +1,16 @@
 package controller
 
 import (
+	"gin_work/common"
+	"gin_work/model"
 	"gin_work/wrap/response"
-	"github.com/gin-gonic/gin"
 	"math/rand"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-type UserLogin struct {
+type LoginForm struct {
 	Username string `form:"username" json:"username" uri:"username" xml:"username" binding:"required,alphanum,min=5,max=20"`
 	Password string `form:"password" json:"password" uri:"password" xml:"password" binding:"required,alphanum,min=8,max=20"`
 	Code     string `form:"code" json:"code" uri:"code" xml:"code" binding:"omitempty,required,alphanum,len=6"`
@@ -34,10 +37,16 @@ func Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": str})
 }
 
-func Login(c *gin.Context) {
-	var user UserLogin
-	err := c.ShouldBind(&user)
+func UserLogin(c *gin.Context) {
+	var login LoginForm
+	err := c.ShouldBind(&login)
 	if err != nil {
+		c.JSON(response.Fail(http.StatusBadRequest, err.Error()))
+	}
+
+	var user *model.User
+	user = user.FindByUsername(login.Username)
+	if err = common.CheckPwd(login.Password, user.Password, user.Salt); err != nil {
 		c.JSON(response.Fail(http.StatusBadRequest, err.Error()))
 	}
 
