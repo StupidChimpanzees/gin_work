@@ -19,7 +19,7 @@ type TestParams struct {
 func Test(c *gin.Context) {
 	id := c.DefaultQuery("id", "0")
 	i, _ := strconv.Atoi(id)
-	storagePlanModel := model.StoragePlanModel{}
+	var storagePlanModel = model.StoragePlanModel{}
 	planInfo, err := storagePlanModel.FindJoinById(i)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

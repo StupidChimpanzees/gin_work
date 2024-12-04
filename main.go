@@ -14,12 +14,22 @@ import (
 )
 
 func main() {
+	r := handler()
+
+	// autotls.Run(r, "example1.com")
+	err := r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
+	if err != nil {
+		log.Fatalf("error info: " + err.Error())
+	}
+}
+
+func handler() *gin.Engine {
 	r := gin.Default()
 
 	// 加载配置
 	err := config.Load("config.yaml")
 	if err != nil {
-		return
+		panic("Config file load error")
 	}
 
 	// 加载全局中间件
@@ -37,9 +47,7 @@ func main() {
 	// 构建路由
 	route.Load(r)
 
-	// autotls.Run(r, "example1.com")
-	err = r.Run(":" + strconv.Itoa(config.Mapping.App.Port))
-	if err != nil {
-		log.Fatalf("error info: " + err.Error())
-	}
+	_ = r.SetTrustedProxies(nil)
+
+	return r
 }
