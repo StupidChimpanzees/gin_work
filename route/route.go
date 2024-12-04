@@ -12,3 +12,7 @@ func (*Route) Load(r *gin.Engine) {
 	r.GET("/index", controller.Index)
 	r.GET("/test", controller.Test)
 }
+
+func (*Route) Login(r *gin.Engine) {
+	r.POST("/login", controller.Login)
+}

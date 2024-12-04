@@ -29,10 +29,10 @@ func (*StoragePlanModel) TableName() string {
 	return "jmk_storage_plan"
 }
 
-func (r *StoragePlanModel) FindJoinById(id int) (*StoragePlanModel, error) {
-	result := database.DB.Find(&r, id)
+func (s *StoragePlanModel) FindJoinById(id int) (*StoragePlanModel, error) {
+	result := database.DB.Find(&s, id)
 	if result.Error != nil {
-		return r, result.Error
+		return s, result.Error
 	}
-	return r, nil
+	return s, nil
 }
