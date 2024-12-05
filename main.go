@@ -29,7 +29,7 @@ func handler() *gin.Engine {
 	// 加载配置
 	err := config.Load("config.yaml")
 	if err != nil {
-		panic("Config file load error")
+		panic(err.Error())
 	}
 
 	// 加载全局中间件

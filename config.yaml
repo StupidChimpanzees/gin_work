@@ -2,7 +2,6 @@ app:
   name: "test"
   version: "1.0.0"
   port: 8082
-
 database:
   db_type: "mysql"
   name: "test"
@@ -35,6 +34,11 @@ session:
   secret: "8621E77D22F0830A46B462E3F46ED917"
   expire: 604800
   session_name: "session_8621E"
+jwt:
+  sign_key: "j1kWID03f_CiELe0fPL"
+  expires: 10
+  issued: 0
+  refresh_expires: 259200
 view:
   temp_path: "public/template/**/*"
   static_path: "public/assets"

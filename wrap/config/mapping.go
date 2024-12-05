@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"gin_work/wrap/utils"
+	"gopkg.in/yaml.v3"
 	"os"
 	"strings"
-
-	"gopkg.in/yaml.v3"
 )
 
 type configMapping struct {
@@ -17,6 +16,7 @@ type configMapping struct {
 	Redis    RedisConfiguration    `yaml:"redis" bson:"redis" json:"redis" xml:"redis"`
 	Cookie   CookieConfiguration   `yaml:"cookie" bson:"cookie" json:"cookie" xml:"cookie"`
 	Session  SessionConfiguration  `yaml:"session" bson:"session" json:"session" xml:"session"`
+	JWT      JWTConfiguration      `yaml:"jwt" bson:"jwt" json:"jwt" xml:"jwt"`
 	View     viewConfiguration     `yaml:"view" bson:"view" json:"view" xml:"view"`
 }
 
@@ -74,6 +74,13 @@ type SessionConfiguration struct {
 	Secret      string `yaml:"secret" bson:"secret" json:"secret" xml:"secret"`
 	Expire      int    `yaml:"expire" bson:"expire" json:"expire" xml:"expire"`
 	SessionName string `yaml:"session_name" bson:"session_name" json:"session_name" xml:"session_name"`
+}
+
+type JWTConfiguration struct {
+	SignKey        string `yaml:"sign_key" bson:"sign_key" json:"sign_key" xml:"sign_key"`
+	Expires        int    `yaml:"expires" bson:"expires" json:"expires" xml:"expires"`
+	Issued         int    `yaml:"issued" bson:"issued" json:"issued" xml:"issued"`
+	RefreshExpires int    `yaml:"refresh_expires" bson:"refresh_expires" json:"refresh_expires" xml:"refresh_expires"`
 }
 
 type viewConfiguration struct {
