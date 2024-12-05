@@ -47,6 +47,10 @@ func UserLogin(c *gin.Context) {
 
 	var user *model.User
 	user.FindByUsername(login.Username)
+	if user == nil {
+		c.JSON(response.Fail(http.StatusBadRequest, "用户账号或密码错误"))
+		return
+	}
 	if err = common.CheckPwd(login.Password, user.Password, user.Salt); err != nil {
 		c.JSON(response.Fail(http.StatusBadRequest, err.Error()))
 		return
@@ -56,11 +60,10 @@ func UserLogin(c *gin.Context) {
 	UserLoginUpdate(user, c.ClientIP())
 
 	// 生成token
-	accessToken, refreshToken, err := common.RefreshNewToken(user.Uuid, c.Request.Host, c.ClientIP())
+	accessToken, err := common.RefreshToken(user.Uuid, c.Request.Host, c.ClientIP())
 	if err != nil {
 		c.JSON(response.Fail(http.StatusBadRequest, err.Error()))
 	}
 	c.Header("access_token", accessToken)
-	c.Header("refresh_token", refreshToken)
 
 }

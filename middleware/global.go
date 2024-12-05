@@ -4,9 +4,10 @@ import (
 	"gin_work/common"
 	"gin_work/extend/jwt"
 	"gin_work/wrap/response"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type GlobalMiddleware struct{}
@@ -32,19 +33,17 @@ func (*GlobalMiddleware) Cors() gin.HandlerFunc {
 func (*GlobalMiddleware) Token() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !common.ExceptUrl(c, "/login", "/sign_in") {
-			accessToken := c.GetHeader("access_token")
-			refreshToken := c.GetHeader("refresh_token")
+			accessToken := c.GetHeader("Authorization")
 			var claims *jwt.TokenClaims
-			claims, accessB, refreshB := common.CheckToken(accessToken, refreshToken, c.Request.Host, c.ClientIP())
-			if !accessB && !refreshB {
+			claims, err := common.CheckToken(accessToken, c.Request.Host, c.ClientIP())
+			if claims == nil && err != nil {
 				c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息已过期"))
-			} else if !accessB && refreshB {
-				accessToken, refreshToken, err := common.RefreshNewToken(claims.ID, claims.Subject, claims.Ip)
+			} else if claims != nil && err.Error() == jwt.ExpiresErr {
+				accessToken, err := common.RefreshToken(claims.ID, claims.Subject, claims.Ip)
 				if err != nil {
 					c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息无法更新"))
 				}
-				c.Header("access_token", accessToken)
-				c.Header("refresh_token", refreshToken)
+				c.Header("Authorization", accessToken)
 			}
 			c.Set("token", claims)
 		}

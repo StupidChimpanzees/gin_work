@@ -1,46 +1,33 @@
 package common
 
 import (
+	"errors"
 	"gin_work/extend/jwt"
-	"gin_work/wrap/config"
 )
 
-func CheckToken(accessToken, refreshToken, domain, ip string) (*jwt.TokenClaims, bool, bool) {
-	if accessToken == "" || refreshToken == "" {
-		return nil, false, false
+func CheckToken(accessToken, domain, ip string) (*jwt.TokenClaims, error) {
+	if accessToken == "" {
+		return nil, errors.New(jwt.TokenErr)
 	}
 	var claims *jwt.TokenClaims
 	var err error
 	claims, err = jwt.ParseToken(accessToken, domain)
 	// access过期
 	if err != nil {
-		claims, err = jwt.ParseToken(refreshToken, domain)
-		// refresh过期
-		if err != nil {
-			return nil, false, false
+		if err.Error() == jwt.ExpiresErr { // 超过有效期
+			return claims, err
 		}
-		// ip不一致
-		if claims.Ip != ip {
-			return nil, false, false
-		}
-		// access过期,refresh不过期
-		return claims, false, true
-	} else if claims.Ip != ip {
-		return nil, false, false
+		return nil, err
+	} else if claims.Ip != ip { // IP不对应
+		return nil, errors.New(jwt.IpErr)
 	}
-	// access不过期,refresh不过期
-	return claims, true, true
+	return claims, nil
 }
 
-func RefreshNewToken(uuid, domain, ip string) (accessToken, refreshToken string, err error) {
-	conf := config.Mapping.JWT
+func RefreshToken(uuid, domain, ip string) (accessToken string, err error) {
 	accessToken, err = jwt.GenerateToken(uuid, domain, ip)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
-	refreshToken, err = jwt.GenerateToken(uuid, domain, ip, conf.RefreshExpires)
-	if err != nil {
-		return "", "", err
-	}
-	return accessToken, refreshToken, err
+	return accessToken, err
 }
