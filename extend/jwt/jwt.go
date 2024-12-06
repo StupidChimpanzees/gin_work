@@ -14,7 +14,7 @@ type TokenClaims struct {
 	jwt.RegisteredClaims
 }
 
-var (
+const (
 	TokenErr      = "token_is_empty"
 	ExpiresErr    = "expires"
 	RefreshExpErr = "refresh_expires"
@@ -46,15 +46,14 @@ func GenerateToken(uuid, domain, ip string, args ...interface{}) (string, error)
 func ParseToken(tokenStr, domain string) (*TokenClaims, error) {
 	jwtConf := config.Mapping.JWT
 
-	var tokenClaims *TokenClaims = &TokenClaims{}
 	now := time.Now()
-	token, err := jwt.ParseWithClaims(tokenStr, tokenClaims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtConf.SignKey), nil
 	}, jwt.WithIssuer(config.Mapping.App.Name), jwt.WithSubject(domain), jwt.WithExpirationRequired(), jwt.WithIssuedAt())
 	if claims, ok := token.Claims.(*TokenClaims); ok && token.Valid {
 		return claims, nil
 	} else if claims.RefreshExpires.Before(now) {
-		return claims, errors.New(RefreshExpErr)
+		return nil, errors.New(RefreshExpErr)
 	} else if claims.ExpiresAt.Before(now) {
 		return claims, errors.New(ExpiresErr)
 	}

@@ -1,5 +1,7 @@
 package response
 
+import "net/http"
+
 type response struct {
 	Code    int         `json:"code" yaml:"code" xml:"code" bson:"code"`
 	Data    interface{} `json:"data" yaml:"data" xml:"data" bson:"data"`
@@ -15,7 +17,7 @@ func newResponse(code int, message string, data interface{}) *response {
 }
 
 func Success(args ...interface{}) (int, *response) {
-	response := newResponse(200, "Success", nil)
+	response := newResponse(http.StatusOK, "Success", nil)
 	if args != nil {
 		if len(args) > 2 {
 			response.Data = args[0]
@@ -28,19 +30,36 @@ func Success(args ...interface{}) (int, *response) {
 			response.Data = args[0]
 		}
 	}
-	return 200, response
+	return response.Code, response
 }
 
 func Fail(args ...interface{}) (int, *response) {
-	response := newResponse(500, "Fail", nil)
+	response := newResponse(http.StatusInternalServerError, "Fail", nil)
 	if args != nil {
 		if len(args) > 2 {
-			response.Code = args[0].(int)
-			response.Message = args[1].(string)
+			response.Message = args[0].(string)
+			response.Code = args[1].(int)
 			response.Data = args[2]
 		} else if len(args) > 1 {
+			response.Message = args[0].(string)
+			response.Code = args[1].(int)
+		} else {
 			response.Code = args[0].(int)
-			response.Message = args[1].(string)
+		}
+	}
+	return response.Code, response
+}
+
+func RequestFail(args ...interface{}) (int, *response) {
+	response := newResponse(http.StatusBadRequest, "Fail", nil)
+	if args != nil {
+		if len(args) > 2 {
+			response.Message = args[0].(string)
+			response.Code = args[1].(int)
+			response.Data = args[2]
+		} else if len(args) > 1 {
+			response.Message = args[0].(string)
+			response.Code = args[1].(int)
 		} else {
 			response.Code = args[0].(int)
 		}

@@ -39,6 +39,10 @@ func (u *User) FindByUsername(username string) {
 	database.DB.Where("username = ?", username).First(&u)
 }
 
+func (u *User) FindByPhone(phone string) {
+	database.DB.Where("phone = ?", phone).First(&u)
+}
+
 func (u *User) FindByEmail(email string) *User {
 	database.DB.Where("email = ?", email).First(&u)
 	return u

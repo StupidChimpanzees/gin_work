@@ -39,8 +39,12 @@ func getConfig() *cache {
 	}
 }
 
-func Has(name string) (bool, error) {
-	return driver.Exists(Cache.Prefix + name)
+func Has(name string) bool {
+	exists, err := driver.Exists(Cache.Prefix + name)
+	if err != nil {
+		return false
+	}
+	return exists
 }
 
 func BindGet(name string, value interface{}) error {
@@ -67,7 +71,7 @@ func Get(name string) (interface{}, error) {
 	return instance, nil
 }
 
-func Set(name string, value interface{}, args ...int) (bool, error) {
+func Set(name string, value interface{}, args ...int) error {
 	timeout := Cache.Timeout
 	if args != nil {
 		timeout = args[0]
@@ -79,9 +83,9 @@ func Set(name string, value interface{}, args ...int) (bool, error) {
 		_, err = driver.Set(Cache.Prefix+name, string(b), timeout)
 	}
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 func Del(name string) (bool, error) {

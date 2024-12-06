@@ -3,6 +3,7 @@ package middleware
 import (
 	"gin_work/common"
 	"gin_work/extend/jwt"
+	"gin_work/wrap/cache"
 	"gin_work/wrap/response"
 	"net/http"
 
@@ -32,20 +33,32 @@ func (*GlobalMiddleware) Cors() gin.HandlerFunc {
 
 func (*GlobalMiddleware) Token() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !common.ExceptUrl(c, "/login", "/sign_in") {
+		if !common.ExceptUrl(c, "/sign_in", "/login", "/send_code", "/code_login") {
 			accessToken := c.GetHeader("Authorization")
 			var claims *jwt.TokenClaims
 			claims, err := common.CheckToken(accessToken, c.Request.Host, c.ClientIP())
-			if claims == nil && err != nil {
-				c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息已过期"))
-			} else if claims != nil && err.Error() == jwt.ExpiresErr {
+			if err == nil {
+				// 用户唯一token是否有效
+				localToken, _ := cache.Get(claims.ID)
+				if localToken.(string) != accessToken {
+					c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息已失效"))
+					return
+				}
+			} else if err.Error() == jwt.ExpiresErr {
+				// 未超出最大刷新时间
 				accessToken, err := common.RefreshToken(claims.ID, claims.Subject, claims.Ip)
 				if err != nil {
 					c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息无法更新"))
+					return
 				}
 				c.Header("Authorization", accessToken)
+				_ = cache.Set(claims.ID, accessToken)
+			} else if claims == nil {
+				c.AbortWithStatusJSON(response.Fail(http.StatusBadRequest, "用户认证信息已过期"))
+				return
 			}
 			c.Set("token", claims)
+			// c.MustGet("token")
 		}
 		c.Next()
 	}

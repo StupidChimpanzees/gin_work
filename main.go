@@ -6,11 +6,11 @@ import (
 	"gin_work/wrap/middleware"
 	"gin_work/wrap/route"
 	"gin_work/wrap/session"
-	"log"
-	"strconv"
-
+	"gin_work/wrap/validator"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"log"
+	"strconv"
 )
 
 func main() {
@@ -43,6 +43,9 @@ func handler() *gin.Engine {
 	// 加载view配置
 	// 目录下必须有.html文件才能使用
 	// view.Load(r)
+
+	// 注册自定义验证
+	validator.Load()
 
 	// 构建路由
 	route.Load(r)
